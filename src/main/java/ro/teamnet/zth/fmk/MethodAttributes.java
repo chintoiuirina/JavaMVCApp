@@ -35,22 +35,22 @@ public class MethodAttributes {
 
     @Override
     public boolean equals(Object o) {
-        if(this == o) {
+        if (this == o) {
             return true;
         }
-        if(o == null || getClass() != o.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
 
         MethodAttributes that = (MethodAttributes) o;
 
-        if(controllerClass != null ? !controllerClass.equals(that.controllerClass) : that.controllerClass != null) {
+        if (controllerClass != null ? !controllerClass.equals(that.controllerClass) : that.controllerClass != null) {
             return false;
         }
-        if(methodType != null ? !methodName.equals(that.methodName) : that.methodName != null) {
+        if (methodType != null ? !methodName.equals(that.methodName) : that.methodName != null) {
             return false;
         }
-        if(methodType != null ? !methodType.equals(that.methodType) : that.methodType != null) {
+        if (methodType != null ? !methodType.equals(that.methodType) : that.methodType != null) {
             return false;
         }
 
@@ -64,4 +64,10 @@ public class MethodAttributes {
         result = 31 * result + (methodType != null ? methodType.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return methodName + " " + controllerClass + " " + methodType;
+    }
+
 }
