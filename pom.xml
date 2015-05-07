@@ -15,7 +15,13 @@
         <jackson-jaxrs.version>1.9.13</jackson-jaxrs.version>
     </properties>
 
+
     <dependencies>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-jaxrs</artifactId>
+            <version>${jackson-jaxrs.version}</version>
+        </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -35,6 +41,7 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
 
     <build>
         <finalName>MVCApp</finalName>
@@ -57,5 +64,5 @@
             </plugin>
         </plugins>
     </build>
-    
+
 </project>

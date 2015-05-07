@@ -1,6 +1,8 @@
 package ro.teamnet.zth.app;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import ro.teamnet.zth.api.annotations.MyController;
+import ro.teamnet.zth.api.annotations.MyParam;
 import ro.teamnet.zth.api.annotations.MyRequestMethod;
 import ro.teamnet.zth.app.controller.DepartmentController;
 import ro.teamnet.zth.app.controller.EmployeeController;
@@ -14,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
@@ -47,7 +50,7 @@ public class MyDispecherServlet extends HttpServlet {
 
     private Object dispatch(HttpServletRequest req, HttpServletResponse resp) {
         String pathInfo = req.getPathInfo();
-        if (pathInfo.startsWith("/employees")) {
+        /*if (pathInfo.startsWith("/employees")) {
             EmployeeController ec = new EmployeeController();
             String allEmployee = ec.getAllEmployees();
             return allEmployee;
@@ -55,6 +58,43 @@ public class MyDispecherServlet extends HttpServlet {
             DepartmentController dp = new DepartmentController();
             return dp.getAllDepartments();
         }
+        */
+        MethodAttributes methodAttributes= allowedMethods.get(pathInfo);
+        if(methodAttributes!=null){
+
+            Class<?> controllerClass = null;
+            try {
+                controllerClass = Class.forName(methodAttributes.getControllerClass());
+                Object o = controllerClass.newInstance();// employee controler sau department contr
+                Method method = controllerClass.getMethod(methodAttributes.getMethodName(),methodAttributes.getMethodParams());
+                //metodele din e.c.  sau e.c.
+                Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+                if(parameterAnnotations.length>0&&parameterAnnotations[0].length>0) {
+                    MyParam myParam = (MyParam) parameterAnnotations[0][0];
+                    Object paramVals = req.getParameter(myParam.name());
+                    return method.invoke(o, paramVals);//ce returneaza metoda
+                }
+                else
+                {
+                    return method.invoke(o);
+                }
+
+
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+
+
+        }
+
         return "Hello!";
 
 
@@ -62,7 +102,11 @@ public class MyDispecherServlet extends HttpServlet {
 
     private void reply(Object r, HttpServletRequest req, HttpServletResponse resp) throws IOException {
         PrintWriter out = resp.getWriter();
-        out.printf(r.toString());
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writeValue(out,r);
+
+       /* out.printf(r.toString());*/
     }
 
     @Override
@@ -97,6 +141,7 @@ public class MyDispecherServlet extends HttpServlet {
                         methodAttributes.setControllerClass(controller.getName());
                         methodAttributes.setMethodName(m.getName());
                         methodAttributes.setMethodType(annotation.methodType());
+                        methodAttributes.setMethodParams(m.getParameterTypes());
                         allowedMethods.put(key, methodAttributes);
                     }
 
